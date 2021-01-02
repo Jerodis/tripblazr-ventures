@@ -41,13 +41,15 @@ class Registration extends Component {
 		} else {
 			const newUser = {
 				userName: userName,
-				password: password,
+        password: password,
+        passwordCheck: passwordConfirm,
 				email: email
 			};
 
-			AuthManager.createUser(newUser).then(response => {
-				this.props.setUser(response);
-				this.props.history.push(`/mytrips`);
+			AuthManager.registerUser(newUser).then(response => {
+        console.log(response);
+				// this.props.setUser(response);
+				// this.props.history.push(`/mytrips`);
 			});
 		}
 	};

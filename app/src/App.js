@@ -1,79 +1,123 @@
-import React from 'react';
-import { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 import ApplicationViews from './component/ApplicationViews';
 import Login from './component/auth/Login';
+import UserContext from './context/UserContext';
+import AuthManager from './modules/AuthManager';
 
-class App extends Component {
-    state = {
-        user: sessionStorage.getItem('activeUser') !== null,
-        activeUser: this.getUser(),
-        email: this.getEmail()
-    };
+const App = (props) =>{
+  const [userData, setUserData] = useState({
+    token: undefined,
+    user: undefined,
+    authenticated: false
+  });
 
-    isAuthenticated = () => sessionStorage.getItem('activeUser') !== null;
+  useEffect(() => {
+    const checkLoggedIn = async () => {
+      let token = localStorage.getItem('auth-token');
+      if (token === null) {
+        localStorage.setItem('auth-token', '');
+        token = '';
+      }
+      const tokenIsValidRequest = await AuthManager.checkUserVerified(token);
+      const tokenIsValid = await tokenIsValidRequest.json();
 
-    setUser = user => {
-        // console.log(user);
-        sessionStorage.setItem('activeUser', user.id);
-        sessionStorage.setItem('userEmail', user.email);
-        this.setState({
-            activeUser: this.getUser(),
-            user: true,
-            email: this.getEmail()
+      if(tokenIsValid) {
+        const userRequest = await AuthManager.getCurrentUser(token);
+        const user = await userRequest.json();
+        setUserData({
+          token,
+          user,
+          authenticated: true
         });
+      }
     };
 
-    getUser() {
+    checkLoggedIn();
+  }, []);
+
+    // let isAuthenticated = () => sessionStorage.getItem('activeUser') !== null;
+
+    const setUser = (loginResult) => {
+      const token = loginResult.token;
+      const user = loginResult.user;
+
+      sessionStorage.setItem('activeUser', user.id);
+      sessionStorage.setItem('userEmail', user.email);
+      localStorage.setItem('auth-token', token);
+
+      setUserData({
+        token,
+        user,
+        authenticated: true
+      });
+
+      // this.setState({
+      //   activeUser: this.getUser(),
+      //   user: true,
+      //   email: this.getEmail()
+      // });
+    };
+
+    const getUser = () => {
         if (sessionStorage.getItem('activeUser')) {
-            return parseInt(sessionStorage.getItem('activeUser'));
+            return sessionStorage.getItem('activeUser');
         } else {
             return '';
         }
     }
 
-    getEmail() {
-        if (sessionStorage.getItem('userEmail')) {
-            return sessionStorage.getItem('userEmail');
-        } else {
-            return '';
-        }
-    }
+    // const getEmail = () => {
+    //     if (sessionStorage.getItem('userEmail')) {
+    //         return sessionStorage.getItem('userEmail');
+    //     } else {
+    //         return '';
+    //     }
+    // }
 
-    clearUser = () => {
+    // let state = {
+    //   user: sessionStorage.getItem('activeUser') !== null,
+    //   activeUser: getUser(),
+    //   email: getEmail()
+    // };
+
+    const clearUser = () => {
         sessionStorage.removeItem('activeUser');
         sessionStorage.removeItem('userEmail');
-        this.setState({
-            user: this.isAuthenticated()
+        localStorage.setItem('auth-token', '');
+        setUserData({
+          token: undefined,
+          user: undefined,
+          authenticated: false
         });
-    };
 
-    render() {
+        // this.setState({
+        //     user: isAuthenticated()
+        // });
+    };
         // console.log('app.js user', this.state.activeUser);
         return (
             <div className='App'>
-                {this.state.user ? (
+              <UserContext.Provider value={{ userData, setUserData}}>
+                {userData.user ? (
                     <>
                         <ApplicationViews
-                            user={this.state.user}
-                            {...this.props}
-                            activeUser={this.state.activeUser}
-                            clearUser={this.clearUser}
-                            email={this.state.email}
+                            isAuthenticated={userData.authenticated}
+                            {...props}
+                            user={userData.user}
+                            clearUser={clearUser}
                         />
                     </>
                 ) : (
                     <Login
-                        getUser={this.getUser}
-                        setUser={this.setUser}
-                        user={this.state.user}
-                        {...this.props}
-                        activeUser={this.state.activeUser}
+                        getUser={getUser}
+                        setUser={setUser}
+                        {...props}
                     />
                 )}
+              </UserContext.Provider>
             </div>
         );
-    }
 }
 
 export default App;

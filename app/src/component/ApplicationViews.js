@@ -22,7 +22,7 @@ class ApplicationViews extends Component {
                     exact
                     path='/'
                     render={props => {
-                        if (this.props.user) {
+                        if (this.props.isAuthenticated) {
                             return <Redirect to='/mytrips' />;
                         } else {
                             return <Redirect to='/login' />;
@@ -34,24 +34,24 @@ class ApplicationViews extends Component {
                     exact
                     path='/mytrips'
                     render={props => {
-                        if (this.props.user && isMobile) {
+                        if (this.props.isAuthenticated && isMobile) {
                             return (
                                 <MobileTripList
                                     {...props}
-                                    activeUser={this.props.activeUser}
+                                    activeUser={this.props.user.id}
                                     clearUser={this.props.clearUser}
-                                    email={this.props.email}
+                                    email={this.props.user.email}
                                     // setOwner={this.setOwner}
                                     // removeOwner={this.removeOwner}
                                 />
                             );
-                        } else if (this.props.user) {
+                        } else if (this.props.isAuthenticated) {
                             return (
                                 <TripList
                                     {...props}
-                                    activeUser={this.props.activeUser}
+                                    activeUser={this.props.user.id}
                                     clearUser={this.props.clearUser}
-                                    email={this.props.email}
+                                    email={this.props.user.email}
                                     // setOwner={this.setOwner}
                                     // removeOwner={this.removeOwner}
                                 />
@@ -66,22 +66,22 @@ class ApplicationViews extends Component {
                     exact
                     path='/mytrips/:tripId(\d+)'
                     render={props => {
-                        if (this.props.user && isMobile) {
+                        if (this.props.isAuthenticated && isMobile) {
                             return (
                                 <MobileTrip
                                     tripId={parseInt(props.match.params.tripId)}
-                                    activeUser={this.props.activeUser}
-                                    email={this.props.email}
+                                    activeUser={this.props.user.id}
+                                    email={this.props.user.email}
                                     //ownerView={this.state.ownerView}
                                     {...props}
                                 />
                             );
-                        } else if (this.props.user) {
+                        } else if (this.props.isAuthenticated) {
                             return (
                                 <Trip
                                     tripId={parseInt(props.match.params.tripId)}
-                                    activeUser={this.props.activeUser}
-                                    email={this.props.email}
+                                    activeUser={this.props.user.id}
+                                    email={this.props.user.email}
                                     //ownerView={this.state.ownerView}
                                     {...props}
                                 />

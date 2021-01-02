@@ -75,6 +75,7 @@ class TripList extends Component {
 	//get all trips
 
 	getTrips = () => {
+    console.log(this.props.activeUser);
 		TripManager.getAllTrips(this.props.activeUser)
 			.then(newTrips => {
 				this.setState({

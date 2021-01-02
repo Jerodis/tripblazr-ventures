@@ -6,7 +6,7 @@ const User = require('../models/userModel');
 
 router.post('/register', async (req, res) => {
   try {
-    let { email, password, passwordCheck, displayName } = req.body;
+    let { email, password, passwordCheck, username } = req.body;
 
     if (!email || !password || !passwordCheck)
       return res.status(400).json({msg: 'Missing required fields'});
@@ -19,14 +19,14 @@ router.post('/register', async (req, res) => {
     if (existingUser)
       return res.status(400).json({msg: 'An account with this email already exists.'});
 
-    if (!displayName) displayName = email;
+    if (!username) username = email;
 
     const salt = await bcrypt.genSalt(10);
     const passwordHash = await bcrypt.hash(password, salt);
     const newUser = new User({
       email,
       password: passwordHash,
-      displayName
+      username
     });
 
     const savedUser = await newUser.save();
@@ -57,7 +57,7 @@ router.post('/login', async (req, res) => {
       token,
       user: {
         id: user._id,
-        displayName: user.displayName,
+        username: user.username,
         email: user.email
       }
     })
@@ -90,6 +90,19 @@ router.post('/tokenIsValid', async (req, res) => {
       return res.json(false);
 
     return res.json(true);
+  } catch (err) {
+    res.status(500).json({error: err.message});
+  }
+});
+
+router.get('/', auth, async (req, res) => {
+  try {
+    const user = await User.findById(req.user);
+    return res.json({
+      displayName: user.username,
+      email: user.email,
+      id: user._id
+    });
   } catch (err) {
     res.status(500).json({error: err.message});
   }

@@ -32,27 +32,42 @@ class Login extends Component {
 		this.setState(stateToChange);
 	};
 
-	handleLogin = e => {
+	handleLogin = async (e) => {
 		e.preventDefault();
 		let userName = this.state.userName;
-		let password = this.state.password;
-		AuthManager.getUser(userName).then(response => {
-			if (response.length === 0) {
-				alert('Please enter a valid User Name.');
-			} else if (response.length === 1 && response[0].password !== password) {
-				alert('Password is incorrect, please try again.');
-				// starting the if statement to check for empty fields//
-			} else if (password === '') {
-				alert('Please fill the Password Form');
-			} else if (userName === '') {
-				alert('Please enter a valid email address');
-			} else if (response[0].password === password) {
-				//response[0].id is the ID of the user you logged in with,
-				//in case of "Steve" it would be "1"
-				this.props.setUser(response[0]);
-				this.props.history.push(`/mytrips`);
-			}
-		});
+    let password = this.state.password;
+
+    if (userName === '') {
+      alert('Please enter a valid email')
+    } else if (password === '') {
+      alert('Please fill the Password Form');
+    } else {
+      const loginRequest = await AuthManager.login({
+        email: userName,
+        password
+      });
+      const loginResult = await loginRequest.json();
+      this.props.setUser(loginResult);
+      this.props.history.push(`/mytrips`);
+    }
+
+		// AuthManager.getUser(userName).then(response => {
+		// 	if (response.length === 0) {
+		// 		alert('Please enter a valid User Name.');
+		// 	} else if (response.length === 1 && response[0].password !== password) {
+		// 		alert('Password is incorrect, please try again.');
+		// 		// starting the if statement to check for empty fields//
+		// 	} else if (password === '') {
+		// 		alert('Please fill the Password Form');
+		// 	} else if (userName === '') {
+		// 		alert('Please enter a valid email address');
+		// 	} else if (response[0].password === password) {
+		// 		//response[0].id is the ID of the user you logged in with,
+		// 		//in case of "Steve" it would be "1"
+		// 		this.props.setUser(response[0]);
+		// 		this.props.history.push(`/mytrips`);
+		// 	}
+		// });
 	};
 
 	render() {
