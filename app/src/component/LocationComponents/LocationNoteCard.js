@@ -17,10 +17,12 @@ class LocationNoteCard extends Component {
 		open: false
 	};
 
-	handleDelete = id => {
-		TripManager.deleteLocationNote(id).then(() => {
-			this.props.getNotes();
-		});
+	handleDelete = async (noteId) => {
+		// TripManager.deleteLocationNote(id).then(() => {
+		// 	this.props.getNotes();
+    // });
+    await TripManager.deleteLocationNote(noteId);
+    this.props.getNotes();
 	};
 
 	//edit modal control
@@ -93,7 +95,7 @@ class LocationNoteCard extends Component {
 										<Button
 											size='small'
 											color='primary'
-											onClick={() => this.handleDelete(this.props.note.id)}
+											onClick={() => this.handleDelete(this.props.note._id)}
 										>
 											Delete
 										</Button>

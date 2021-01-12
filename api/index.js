@@ -16,6 +16,7 @@ app.listen(PORT, () => console.log(`Server Started on port ${PORT}`));
 
 mongoose.connect(
   process.env.MONGODB_CONNECTION_STRING, {
+  // process.env.MONGODB_CONNECTION_STRING_LOCAL, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useCreateIndex: true
@@ -28,3 +29,4 @@ mongoose.connect(
 // routes
 
 app.use('/users', require('./routes/userRouter'));
+app.use('/trips', require('./routes/tripRouter'));

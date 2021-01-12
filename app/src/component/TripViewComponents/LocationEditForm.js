@@ -38,6 +38,20 @@ const styles = theme => ({
 		minWidth: 200
 	}
 });
+
+const locationTypesPlaceholder = [{
+  id: 1,
+  name: 'Lodging'
+},{
+  id: 2,
+  name: 'Activity'
+},{
+  id: 3,
+  name: 'Food'
+},{
+  id: 4,
+  name: 'Transportation'
+}];
 class LocationEditForm extends Component {
 	state = {
 		tripId: '',
@@ -47,12 +61,15 @@ class LocationEditForm extends Component {
 		address: '',
 		price: '',
 		likes: '',
-		locationTypeId: '',
+		locationType: {
+      id: undefined,
+      name: ''
+    },
 		name: '',
 		star: '',
 		url: '',
 		loadingStatus: false,
-		id: '',
+		_id: '',
 		labelWidth: 0
 		// imageLink: ''
 	};
@@ -63,13 +80,14 @@ class LocationEditForm extends Component {
 		this.setState(stateToChange);
 	};
 
-	handleChange = name => event => {
-		this.setState({ [name]: event.target.value });
+	locationTypeChange = () => event => {
+    const newLocType = locationTypesPlaceholder.find(locType => locType.id === parseInt(event.target.value));
+		this.setState({ locationType: newLocType });
 	};
 
-	updateLocation = evt => {
+	updateLocation = async evt => {
 		evt.preventDefault();
-		if (this.state.name === '' || this.state.locationTypeId === '') {
+		if (this.state.name === '' || this.state.locationType.id === '') {
 			window.alert(
 				'Well this is awkward...  you have to enter a name and type.'
 			);
@@ -78,7 +96,7 @@ class LocationEditForm extends Component {
 				'Well this is awkward... you need to enter numbers for the cost... youll thank us later.'
 			);
 		} else {
-			this.setState({ loadingStatus: true });
+      this.setState({ loadingStatus: true });
 			const location = {
 				tripId: this.state.tripId,
 				summary: this.state.summary,
@@ -87,18 +105,18 @@ class LocationEditForm extends Component {
 				address: this.state.address,
 				price: parseFloat(this.state.price),
 				likes: parseInt(this.state.likes),
-				locationTypeId: parseInt(this.state.locationTypeId),
+				locationType: this.state.locationType,
 				name: this.state.name,
 				url: this.state.url,
 				star: this.state.star,
-				id: this.state.id
-			};
+				_id: this.state._id
+      };
 
-			TripManager.updateLocation(location).then(() => {
-				this.props.getData();
-				this.props.closeDrawer();
-				this.setState({ loadingStatus: false });
-			});
+      await TripManager.updateLocation(location);
+			this.props.getData();
+			this.props.closeDrawer();
+			this.setState({ loadingStatus: false });
+      
 		}
 	};
 	componentDidMount() {
@@ -111,13 +129,14 @@ class LocationEditForm extends Component {
 			address: this.props.location.address,
 			price: this.props.location.price,
 			likes: this.props.location.likes,
-			locationTypeId: this.props.location.locationTypeId,
+			locationType: this.props.location.locationType,
 			name: this.props.location.name,
 			url: this.props.location.url,
 			star: this.props.location.star,
-			id: this.props.location.id
+			_id: this.props.location._id
 		});
-		//console.log('location form props', this.props);
+    // console.log('location form props', this.props);
+    
 	}
 
 	render() {
@@ -176,21 +195,20 @@ class LocationEditForm extends Component {
 									Type
 								</InputLabel>
 								<NativeSelect
-									value={this.state.locationTypeId}
-									onChange={this.handleChange('locationTypeId')}
+									value={this.state.locationType.id}
+									onChange={this.locationTypeChange('locationType')}
 									input={
 										<OutlinedInput
 											name='type'
 											labelWidth={this.state.labelWidth}
-											id='locationTypeId'
+											id='locationType.id'
 										/>
 									}
 								>
 									<option value='' />
-									<option value={1}>Lodging</option>
-									<option value={2}>Activity</option>
-									<option value={3}>Food</option>
-									<option value={4}>Transportation</option>
+                  {locationTypesPlaceholder.map((locType) => {
+                    return <option key={locType.id} value={locType.id}>{locType.name}</option>
+                  })}
 								</NativeSelect>
 							</FormControl>
 							<div className='midFormText'>

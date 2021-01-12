@@ -203,7 +203,7 @@ class Trip extends Component {
 	//fetch trip locations and trip details
 
 	getData = () => {
-		TripManager.getTrip(this.props.tripId).then(locations => {
+		TripManager.getTripLocations(this.props.tripId).then(locations => {
 			this.setState({
 				locations: locations,
 				clickedCoords: []
@@ -221,40 +221,40 @@ class Trip extends Component {
 
 	//get partial data based on filters, but not reset map
 
-	getDataLite = () => {
-		if (this.state.lastFilter === 'star') {
-			TripManager.getStarTrip(this.props.tripId).then(locations => {
-				this.setState({
-					locations: locations,
-					clickedCoords: []
-				});
+	getDataLite = async () => {
+		// if (this.state.lastFilter === 'star') {
+		// 	TripManager.getStarTrip(this.props.tripId).then(locations => {
+		// 		this.setState({
+		// 			locations: locations,
+		// 			clickedCoords: []
+		// 		});
+		// 	});
+		// } else if (
+		// 	this.state.lastFilter === 1 ||
+		// 	this.state.lastFilter === 2 ||
+		// 	this.state.lastFilter === 3 ||
+		// 	this.state.lastFilter === 4
+		// ) {
+		// 	TripManager.getTripByType(this.props.tripId, this.state.lastFilter).then(
+		// 		locations => {
+		// 			console.log('refresh lite by type', this.state.lastFilter);
+		// 			this.setState({
+		// 				locations: locations,
+		// 				clickedCoords: [],
+		// 				droppedPin: false
+		// 			});
+		// 			//this.refs.mapper.resetScroll();
+		// 		}
+		// 	);
+		// } else {
+      const tripLocationsRequest = await TripManager.getTripLocations(this.props.tripId);
+      const tripLocationsResults = await tripLocationsRequest.json();
+			this.setState({
+				locations: tripLocationsResults,
+				clickedCoords: [],
+				droppedPin: false
 			});
-		} else if (
-			this.state.lastFilter === 1 ||
-			this.state.lastFilter === 2 ||
-			this.state.lastFilter === 3 ||
-			this.state.lastFilter === 4
-		) {
-			TripManager.getTripByType(this.props.tripId, this.state.lastFilter).then(
-				locations => {
-					console.log('refresh lite by type', this.state.lastFilter);
-					this.setState({
-						locations: locations,
-						clickedCoords: [],
-						droppedPin: false
-					});
-					//this.refs.mapper.resetScroll();
-				}
-			);
-		} else {
-			TripManager.getTrip(this.props.tripId).then(locations => {
-				this.setState({
-					locations: locations,
-					clickedCoords: [],
-					droppedPin: false
-				});
-			});
-		}
+		// }
 		this.setState({
 			geoMarker: {}
 		});
@@ -262,54 +262,71 @@ class Trip extends Component {
 
 	
 
-	componentDidMount() {
+	async componentDidMount() {
 		//console.log('props from tripcard', this.props);
 
 		//get trip details, then check for trip ownership, shared trip, public trip
 		//to determine access level
-
-		TripManager.getTrip(this.props.tripId)
-			.then(locations => {
-				this.setState({
-					locations: locations,
-					clickedCoords: []
-				});
-			})
-			.then(() => {
-				let email = this.props.email;
-				//console.log('email', email);
-				let emailCheck = function(element) {
-					// function to check whether a trip has been shared with your email
-					return element.friendEmail === email;
-				};
-				TripManager.getTripDetails(this.props.tripId).then(details => {
-					//no detail go back to mytrips
-					if (details.length === 0) {
-						this.props.history.push(`/mytrips`);
-					//details and ownership match active user display trip
-					} else if (details[0].userId === this.props.activeUser) {
-						this.setState({
-							myTrip: true,
-							tripDetails: details[0]
-						});
-					//if no trip ownership check for shared email, if match, shared trip
-					} else if (details[0].sharedTrips.some(emailCheck)) {
-						this.setState({
-							tripDetails: details[0],
-							sharedTrip: true
-						});
-					//check for public trip
-					} else if (details[0].published === true) {
-						this.setState({
-							tripDetails: details[0],
-							publicTrip: true
-						});
-					//if none of the above, return to mytrips
-					} else {
-						this.props.history.push(`/mytrips`);
-					}
-				});
-			});
+		// TripManager.getTrip(this.props.tripId)
+		// 	.then(locations => {
+		// 		this.setState({
+		// 			locations: locations,
+		// 			clickedCoords: []
+		// 		});
+    //   });
+      const locationsRequest = await TripManager.getTripLocations(this.props.tripId);
+      const locationsResult = await locationsRequest.json();
+      
+      this.setState({
+        locations: locationsResult,
+        clickedCoords: []
+      });
+			// .then(() => {
+			// 	let email = this.props.email;
+			// 	//console.log('email', email);
+			// 	let emailCheck = function(element) {
+			// 		// function to check whether a trip has been shared with your email
+			// 		return element.friendEmail === email;
+      // 	};
+      
+      const tripDetailsRequest = await TripManager.getTripDetails(this.props.tripId);
+      const tripDetailsResult = await tripDetailsRequest.json();
+      if (!tripDetailsResult) 
+        this.props.history.push(`mytrips`);
+      if (tripDetailsResult.userId === this.props.activeUser) {
+        this.setState({
+          myTrip: true,
+          tripDetails: tripDetailsResult
+        });
+      }
+			// 	// TripManager.getTripDetails(this.props.tripId).then(details => {
+			// 	// 	//no detail go back to mytrips
+			// 	// 	if (details.length === 0) {
+			// 	// 		this.props.history.push(`/mytrips`);
+			// 	// 	//details and ownership match active user display trip
+			// 	// 	} else if (details[0].userId === this.props.activeUser) {
+			// 	// 		this.setState({
+			// 	// 			myTrip: true,
+			// 	// 			tripDetails: details[0]
+			// 	// 		});
+			// 	// 	//if no trip ownership check for shared email, if match, shared trip
+			// 	// 	} else if (details[0].sharedTrips.some(emailCheck)) {
+			// 	// 		this.setState({
+			// 	// 			tripDetails: details[0],
+			// 	// 			sharedTrip: true
+			// 	// 		});
+			// 	// 	//check for public trip
+			// 	// 	} else if (details[0].published === true) {
+			// 	// 		this.setState({
+			// 	// 			tripDetails: details[0],
+			// 	// 			publicTrip: true
+			// 	// 		});
+			// 	// 	//if none of the above, return to mytrips
+			// 	// 	} else {
+			// 	// 		this.props.history.push(`/mytrips`);
+			// 	// 	}
+			// 	// });
+			// });
 	}
 
 	//when marker is clicked add obj to state
@@ -348,7 +365,7 @@ class Trip extends Component {
 		// );
 
 		//variable and function for displaying values of trip locations
-		let tripCost = 0;
+    let tripCost = 0;
 
 		this.state.locations.forEach(location => {
 			//console.log(parsed);
@@ -357,7 +374,7 @@ class Trip extends Component {
 			} else {
 				tripCost += parseInt(location.price);
 			}
-		});
+    });
 
 		return (
 			<>
@@ -445,7 +462,7 @@ class Trip extends Component {
 						<div className='listWrapper'>
 							{this.state.locations.map(location => (
 								<LocationCard
-									key={location.id}
+									key={location._id}
 									location={location}
 									getData={this.getDataLite}
 									clickedCardItem={this.clickedCardItem}
@@ -463,7 +480,7 @@ class Trip extends Component {
 						<div className='mapWrapper'>
 							<Mapper
 								ref='mapper'
-								className='mapper'
+                className='mapper'
 								locations={this.state.locations}
 								tripDetails={this.state.tripDetails}
 								scrollTo={this.scrollTo}

@@ -14,21 +14,31 @@ class LocationNotes extends Component {
 		addNote: false
 	};
 
-	componentDidMount() {
+	async componentDidMount() {
 		//getAll from AnimalManager and hang on to that data; put it in state
-		TripManager.getLocationNotes(this.props.locationId).then(notes => {
-			this.setState({
-				notes: notes
-			});
-		});
+		// TripManager.getLocationNotes(this.props.locationId).then(notes => {
+		// 	this.setState({
+		// 		notes: notes
+		// 	});
+    // });
+    const locationNotesRequest = await TripManager.getLocationNotes(this.props.locationId);
+    const locationNotesResults = await locationNotesRequest.json();
+    this.setState({
+      notes: locationNotesResults
+    });
 	}
 
-	getNotes = () => {
-		TripManager.getLocationNotes(this.props.locationId).then(notes => {
-			this.setState({
-				notes: notes
-			});
-		});
+	getNotes = async () => {
+		// TripManager.getLocationNotes(this.props.locationId).then(notes => {
+		// 	this.setState({
+		// 		notes: notes
+		// 	});
+    // });
+    const locationNotesRequest = await TripManager.getLocationNotes(this.props.locationId);
+    const locationNotesResults = await locationNotesRequest.json();
+    this.setState({
+      notes: locationNotesResults
+    });
 	};
 
 	newNote = () => {
@@ -69,7 +79,7 @@ class LocationNotes extends Component {
 				)}
 				{this.state.notes.map(note => (
 					<LocationNoteCard
-						key={note.id}
+						key={note._id}
 						note={note}
 						{...this.props}
 						getNotes={this.getNotes}

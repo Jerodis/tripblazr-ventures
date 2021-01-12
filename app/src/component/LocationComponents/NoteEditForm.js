@@ -57,7 +57,7 @@ class NoteEditForm extends React.Component {
         this.setState({ [name]: event.target.value });
     };
 
-    updateExistingNote = () => {
+    updateExistingNote = async () => {
         //evt.preventDefault()
         this.setState({ loadingStatus: true });
         const editedNote = {
@@ -65,29 +65,44 @@ class NoteEditForm extends React.Component {
             date: this.state.date,
             note: this.state.note,
             editTimeStamp: moment(new Date()),
-            id: this.props.note.id,
+            _id: this.props.note._id,
             title: this.state.title,
             type: this.state.type
         };
 
-        TripManager.updateLocationNote(editedNote)
-            .then(this.props.getNotes)
-            .then(this.setState({ loadingstatus: false }));
+        // TripManager.updateLocationNote(editedNote)
+        //     .then(this.props.getNotes)
+        //     .then(this.setState({ loadingstatus: false }));
+        await TripManager.updateLocationNote(editedNote);
+        this.props.getNotes();
+        this.setState({loadingStatus: false});
         this.props.handleClose();
     };
 
-    componentDidMount() {
-        TripManager.getLocationNote(this.props.note.id).then(note => {
-            this.setState({
-                userId: this.props.activeUser,
-                date: note.date,
-                note: note.note,
-                loadingStatus: false,
-                type: note.type,
-                title: note.title
-                //labelWidth: ReactDOM.findDOMNode(this.InputLabelRef).offsetWidth
-            });
-        });
+    async componentDidMount() {
+      const locationNoteRequest = await TripManager.getLocationNote(this.props.note._id);
+      const locationNoteResult = await locationNoteRequest.json();
+
+      this.setState({
+        userId: this.props.activeUser,
+        date: locationNoteResult.date,
+        note: locationNoteResult.note,
+        loadingStatus: false,
+        type: locationNoteResult.type,
+        title: locationNoteResult.title
+      });
+
+        // TripManager.getLocationNote(this.props.note.id).then(note => {
+        //     this.setState({
+        //         userId: this.props.activeUser,
+        //         date: note.date,
+        //         note: note.note,
+        //         loadingStatus: false,
+        //         type: note.type,
+        //         title: note.title
+        //         //labelWidth: ReactDOM.findDOMNode(this.InputLabelRef).offsetWidth
+        //     });
+        // });
     }
 
     // handleClick = evt => {

@@ -51,7 +51,7 @@ class TripForm extends Component {
 
     /*  Local method for validation, set loadingStatus, create animal object, invoke the AnimalManager post method, and redirect to the full animal list
      */
-    constructNewTrip = evt => {
+    constructNewTrip = async evt => {
         evt.preventDefault();
         if (this.state.tripName === '' || this.state.city === '') {
             window.alert('Please input an trip destination and name');
@@ -72,10 +72,10 @@ class TripForm extends Component {
 
             // Create the animal and redirect user to animal list
             this.props.handleClose();
-            TripManager.postTrip(trip).then(() => {
-                console.log('addform props', this.props);
-                this.props.getTrips();
-            });
+            const postTripRequest = await TripManager.postTrip(trip);
+            const postTripResult = await postTripRequest.json();
+            console.log(postTripResult);
+            this.props.getTrips();
         }
     };
 

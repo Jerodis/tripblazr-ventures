@@ -67,7 +67,7 @@ class AddNoteForm extends React.Component {
         this.setState({ [name]: event.target.value });
     };
 
-    addNewNote = () => {
+    addNewNote = async () => {
         // evt.preventDefault();
         this.setState({ loadingStatus: true });
         if (this.state.message === '' || this.state.type === '') {
@@ -79,22 +79,34 @@ class AddNoteForm extends React.Component {
                 date: moment(new Date()),
                 note: this.state.note,
                 userId: userId,
-                editTimeStamp: '',
+                editTimeStamp: moment(new Date()),
                 title: this.state.title,
                 type: this.state.type
             };
-            TripManager.postLocationNote(message)
-                .then(this.props.getNotes)
-                .then(
-                    this.setState({
-                        date: '',
-                        note: '',
-                        loadingStatus: false,
-                        editTimeStamp: '',
-                        title: '',
-                        type: ''
-                    })
-                );
+            
+            await TripManager.postLocationNote(message);
+
+            await this.props.getNotes();
+            this.setState({
+              date: '',
+              note: '',
+              loadingStatus: false,
+              editTimeStamp: '',
+              title: '',
+              type: ''
+            });
+            // TripManager.postLocationNote(message)
+            //     .then(this.props.getNotes)
+            //     .then(
+            //         this.setState({
+            //             date: '',
+            //             note: '',
+            //             loadingStatus: false,
+            //             editTimeStamp: '',
+            //             title: '',
+            //             type: ''
+            //         })
+            //     );
             this.props.closeNewNote();
         }
     };

@@ -202,7 +202,7 @@ class MobileTrip extends Component {
 	//fetch trip locations and trip details
 
 	getData = () => {
-		TripManager.getTrip(this.props.tripId).then(locations => {
+		TripManager.getTripLocations(this.props.tripId).then(locations => {
 			this.setState({
 				locations: locations,
 				clickedCoords: []
@@ -246,7 +246,7 @@ class MobileTrip extends Component {
 				}
 			);
 		} else {
-			TripManager.getTrip(this.props.tripId).then(locations => {
+			TripManager.getTripLocations(this.props.tripId).then(locations => {
 				this.setState({
 					locations: locations,
 					clickedCoords: [],
@@ -267,7 +267,7 @@ class MobileTrip extends Component {
 		//get trip details, then check for trip ownership, shared trip, public trip
 		//to determine access level
 
-		TripManager.getTrip(this.props.tripId)
+		TripManager.getTripLocations(this.props.tripId)
 			.then(locations => {
 				this.setState({
 					locations: locations,

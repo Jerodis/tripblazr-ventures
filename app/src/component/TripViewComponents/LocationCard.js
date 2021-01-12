@@ -20,8 +20,10 @@ class LocationCard extends Component {
 		this.setState({ star: this.props.location.star });
 	}
 
-	handleDelete = id => {
-		TripManager.deleteLocation(id).then(() => this.props.getData());
+	handleDelete = async (locationId) => {
+    // TripManager.deleteLocation(id).then(() => this.props.getData());
+    await TripManager.deleteLocation(locationId);
+    this.props.getData();
 	};
 
 	addStar = (e, locationId) => {
@@ -49,21 +51,21 @@ class LocationCard extends Component {
 		if (this.props.hovered === this.props.location.id) {
 			hoverCard = 'tripCardHover';
 		} else {
-			hoverCard = 'tripCard' + this.props.location.locationTypeId;
+			hoverCard = 'tripCard' + this.props.location.locationType.id;
 		}
 
-		//console.log('hovered props', this.props.hovered);
+    //console.log('hovered props', this.props.hovered);
 		return (
 			<>
 				<Card className={hoverCard} elevation={4}>
-					<div className={'scroll' + this.props.location.id}></div>
+					<div className={'scroll' + this.props.location._id}></div>
 					<CardActionArea
 						onClick={() => this.props.toggleLocDrawer(this.props.location)}
 						className='cardActionArea'
 					>
 						{!this.props.publicTrip ? (
 							<p className='cardLabel'>
-								{this.props.location.locationType.locationType}
+								{this.props.location.locationType.name}
 
 								{this.state.star ? (
 									<StarIcon
@@ -80,7 +82,7 @@ class LocationCard extends Component {
 							</p>
 						) : (
 							<p className='cardLabel'>
-								{this.props.location.locationType.locationType}
+								{this.props.location.locationType.name}
 
 								{this.state.star ? (
 									<StarIcon
@@ -112,7 +114,7 @@ class LocationCard extends Component {
 					</CardActionArea>
 
 					<CardActions
-						className={'cardButtons' + this.props.location.locationTypeId}
+						className={'cardButtons' + this.props.location.locationType.id}
 					>
 						<p className='price'>
 							<b>
@@ -124,7 +126,7 @@ class LocationCard extends Component {
 								<Button
 									size='small'
 									color='primary'
-									onClick={() => this.handleDelete(this.props.location.id)}
+									onClick={() => this.handleDelete(this.props.location._id)}
 								>
 									Delete
 								</Button>

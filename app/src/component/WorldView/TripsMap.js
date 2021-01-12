@@ -151,13 +151,13 @@ class TripMapper extends Component {
                     >
                         {this.props.trips.map(trip => (
                             <Link
-                                key={trip.id}
-                                to={`/mytrips/${trip.id}`}
+                                key={trip._id}
+                                to={`/mytrips/${trip._id}`}
                                 trip={trip}
                             >
                                 <Marker
                                     className='location'
-                                    key={trip.id}
+                                    key={trip._id}
                                     position={[trip.lat, trip.lng]}
                                     anchor='bottom'
                                     onMouseMove={e => this.markerFocus(trip)}
@@ -165,7 +165,7 @@ class TripMapper extends Component {
                                     //onMouseOut={e => this.props.hoverRemoveFocus()}
                                     onClick={e =>
                                         this.props.history.push(
-                                            `/mytrips/${trip.id}`
+                                            `/mytrips/${trip._id}`
                                         )
                                     }
                                     // icon={this.configMyIcon(location.locationType)}

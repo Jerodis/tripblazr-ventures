@@ -446,7 +446,7 @@ export default class Mapper extends Component {
 							{this.props.locations.map(location => (
 								<Marker
 									className='location'
-									key={location.id}
+									key={location._id}
 									position={[location.lat, location.lng]}
 									onMouseMove={e => this.markerFocus(e, location)}
 									// onMouseOut={e => this.props.hoverRemoveFocus()}

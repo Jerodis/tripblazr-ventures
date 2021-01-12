@@ -25,7 +25,7 @@ class TripCard extends Component {
 
 	editName = tripId => {
 		let trip = {
-			id: tripId,
+			_id: tripId,
 			name: this.state.name
 		};
 		TripManager.updateTrip(trip).then(() => this.props.getTrips());
@@ -42,8 +42,10 @@ class TripCard extends Component {
 		this.setState(stateToChange);
 	};
 
-	handleDelete = id => {
-		TripManager.deleteTrip(id).then(() => this.props.getTrips());
+	handleDelete = async (tripId) => {
+    console.log(tripId);
+    await TripManager.deleteTrip(tripId);
+    this.props.getTrips();
 	};
 	render() {
 		let hoverCard;
@@ -80,7 +82,7 @@ class TripCard extends Component {
 					) : (
 						<CardActionArea className='cardActionArea'>
 							<Link
-								to={`/mytrips/${this.props.trip.id}`}
+								to={`/mytrips/${this.props.trip._id}`}
 								trip={this.props.trip}
 							>
 								<CardContent className='cardContent'>
@@ -104,7 +106,7 @@ class TripCard extends Component {
 								<Button
 									size='small'
 									color='primary'
-									onClick={() => this.editName(this.props.trip.id)}
+									onClick={() => this.editName(this.props.trip._id)}
 								>
 									submit
 								</Button>
@@ -121,7 +123,7 @@ class TripCard extends Component {
 								<Button
 									size='small'
 									color='primary'
-									onClick={() => this.handleDelete(this.props.trip.id)}
+									onClick={() => this.handleDelete(this.props.trip._id)}
 								>
 									Delete
 								</Button>

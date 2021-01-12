@@ -92,25 +92,38 @@ class LocationDetail extends Component {
 		});
 	};
 
-	componentDidMount() {
-		TripManager.getAllTrips(this.props.activeUser).then(data => {
-			TripManager.getTripDetails(this.props.tripId).then(trip => {
-				console.log('mount', trip);
-				this.setState({
-					location: this.props.location,
-					loaded: true,
-					myTrips: data,
-					tripLikes: trip[0].likes
-				});
-			});
-		});
+	async componentDidMount() {
+    const allTripsRequest = await TripManager.getMyTrips(this.props.activeUser);
+    const allTripsResult = await allTripsRequest.json();
 
-		//console.log('all props', this.props);
+    const tripDetailsRequest = await TripManager.getTripDetails(this.props.location.tripId);
+    const tripDetailsResult = await tripDetailsRequest.json();
+
+    this.setState({
+      location: this.props.location,
+      loaded: true,
+      myTrips: allTripsResult,
+      tripLikes: tripDetailsResult.likes
+    });
+
+		// TripManager.getAllTrips(this.props.activeUser).then(data => {
+		// 	TripManager.getTripDetails(this.props.tripId).then(trip => {
+		// 		console.log('mount', trip);
+		// 		this.setState({
+		// 			location: this.props.location,
+		// 			loaded: true,
+		// 			myTrips: data,
+		// 			tripLikes: trip[0].likes
+		// 		});
+		// 	});
+		// });
+
+		// console.log('all props', this.props);
 	}
 
 	render() {
 		// let siteLink = 'https://';
-		console.log('deets props', this.props.tripId);
+		// console.log('deets props', this.props.tripId);
 
 		return (
 			<>
@@ -216,7 +229,7 @@ class LocationDetail extends Component {
 
 						<LocationNotes
 							activeUser={this.props.activeUser}
-							locationId={this.state.location.id}
+							locationId={this.state.location._id}
 							publicTrip={this.props.publicTrip}
 						/>
 					</div>

@@ -64,7 +64,7 @@ class ApplicationViews extends Component {
 
                 <Route
                     exact
-                    path='/mytrips/:tripId(\d+)'
+                    path='/mytrips/:tripId'
                     render={props => {
                         if (this.props.isAuthenticated && isMobile) {
                             return (
@@ -79,7 +79,7 @@ class ApplicationViews extends Component {
                         } else if (this.props.isAuthenticated) {
                             return (
                                 <Trip
-                                    tripId={parseInt(props.match.params.tripId)}
+                                    tripId={props.match.params.tripId}
                                     activeUser={this.props.user.id}
                                     email={this.props.user.email}
                                     //ownerView={this.state.ownerView}

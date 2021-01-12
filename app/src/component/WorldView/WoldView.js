@@ -74,31 +74,45 @@ class TripList extends Component {
 
 	//get all trips
 
-	getTrips = () => {
-    console.log(this.props.activeUser);
-		TripManager.getAllTrips(this.props.activeUser)
-			.then(newTrips => {
-				this.setState({
-					trips: newTrips,
-					clickedCoords: [],
-					shareView: false,
-					publicView: false
-				});
-			})
-			.then(() => {
-				TripManager.getSharedTrips(this.props.email).then(newSharedTrips => {
-					//console.log('new shared', newSharedTrips);
-					let sharedMapTrips = [];
-					newSharedTrips.forEach(trip => {
-						sharedMapTrips.push(trip.trip);
-						//console.log('trip trip', trip.trip);
-					});
-					this.setState({
-						sharedMapTrips: sharedMapTrips,
-						sharedTrips: newSharedTrips
-					});
-				});
-			});
+	getTrips = async () => {
+    const myTripsRequest = await TripManager.getMyTrips(this.props.activeUser);
+    const myTripsResult = await myTripsRequest.json();
+    this.setState({
+      trips: myTripsResult,
+      clickedCoords: [],
+      sharedView: false,
+      publicView: false
+    });
+
+    // const sharedTripsRequest = await TripManager.getSharedTrips(this.props.email);
+    // const sharedTripResult = await sharedTripsRequest.json();
+
+    // this.setState({
+    //   sharedMapTrips: sharedTripResult
+    // });
+
+			// .then(myTrips => {
+				// this.setState({
+				// 	trips: newTrips,
+				// 	clickedCoords: [],
+				// 	shareView: false,
+				// 	publicView: false
+				// });
+			// })
+			// .then(() => {
+			// 	TripManager.getSharedTrips(this.props.email).then(newSharedTrips => {
+			// 		//console.log('new shared', newSharedTrips);
+			// 		let sharedMapTrips = [];
+			// 		newSharedTrips.forEach(trip => {
+			// 			sharedMapTrips.push(trip.trip);
+			// 			//console.log('trip trip', trip.trip);
+			// 		});
+			// 		this.setState({
+			// 			sharedMapTrips: sharedMapTrips,
+			// 			sharedTrips: newSharedTrips
+			// 		});
+			// 	});
+			// });
 		//this.props.setOwner();
 	};
 

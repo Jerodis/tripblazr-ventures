@@ -37,6 +37,21 @@ const styles = theme => ({
         minWidth: 200
     }
 });
+
+const locationTypesPlaceholder = [{
+  id: 1,
+  name: 'Lodging'
+},{
+  id: 2,
+  name: 'Activity'
+},{
+  id: 3,
+  name: 'Food'
+},{
+  id: 4,
+  name: 'Transportation'
+}];
+
 class LocationForm extends Component {
     state = {
         tripId: '',
@@ -46,7 +61,10 @@ class LocationForm extends Component {
         address: '',
         price: '',
         likes: 0,
-        locationTypeId: '',
+        locationType: {
+          id: undefined,
+          name: ''
+        },
         name: '',
         star: false,
         url: '',
@@ -61,13 +79,14 @@ class LocationForm extends Component {
         this.setState(stateToChange);
     };
 
-    handleChange = name => event => {
-        this.setState({ [name]: event.target.value });
+    locationTypeChange = () => event => {
+      const newLocType = locationTypesPlaceholder.find(locType => locType.id === parseInt(event.target.value));
+      this.setState({ locationType: newLocType });
     };
 
-    constructNewLocation = evt => {
+    constructNewLocation = async evt => {
         evt.preventDefault();
-        if (this.state.name === '' || this.state.locationTypeId === '') {
+        if (this.state.name === '' || this.state.locationType.id === '') {
             window.alert(
                 'Well this is awkward...  you have to enter a name and type.'
             );
@@ -85,28 +104,30 @@ class LocationForm extends Component {
                 address: this.state.address,
                 price: parseFloat(this.state.price),
                 likes: this.state.likes,
-                locationTypeId: parseInt(this.state.locationTypeId),
+                locationType: this.state.locationType,
                 name: this.state.name,
                 url: this.state.url,
                 star: false
             };
 
             this.props.handleClose();
-            TripManager.postLocation(location).then(() => {
-                this.props.getData();
-                this.setState({ loadingStatus: false });
-            });
+
+            const postLocationRequest = await TripManager.postLocation(location);
+            const postLocationResult = await postLocationRequest.json();
+            console.log(postLocationResult, 'rezzy');
+            this.props.getData();
+            this.setState({ loadingStatus: false });
         }
     };
     componentDidMount() {
         this.setState({
             labelWidth: ReactDOM.findDOMNode(this.InputLabelRef).offsetWidth
         });
-        console.log('location form props', this.props);
+        // console.log('location form props', this.props);
         //add some logic here to manage the obj that is passed
         if (this.props.geoMarker.properties) {
             this.setState({
-                tripId: this.props.tripDetails.id,
+                tripId: this.props.tripDetails._id,
                 lat: this.props.geoMarker.center.lat,
                 lng: this.props.geoMarker.center.lng,
                 address: this.props.geoMarker.name.split(/,(.+)/)[1],
@@ -124,7 +145,7 @@ class LocationForm extends Component {
 
     render() {
         const { classes } = this.props;
-        console.log('state', this.state.locationTypeId);
+        // console.log('state', this.state.locationTypeId);
         return (
             <>
                 <form
@@ -164,23 +185,20 @@ class LocationForm extends Component {
                                     Type
                                 </InputLabel>
                                 <NativeSelect
-                                    value={this.state.locationTypeId}
-                                    onChange={this.handleChange(
-                                        'locationTypeId'
-                                    )}
+                                    value={this.state.locationType.id}
+                                    onChange={this.locationTypeChange('locationType')}
                                     input={
                                         <OutlinedInput
                                             name='type'
                                             labelWidth={this.state.labelWidth}
-                                            id='locationTypeId'
+                                            id='locationType.id'
                                         />
                                     }
                                 >
                                     <option value='' />
-                                    <option value={1}>Lodging</option>
-                                    <option value={2}>Activity</option>
-                                    <option value={3}>Food</option>
-                                    <option value={4}>Transportation</option>
+                                    {locationTypesPlaceholder.map((locType) => {
+                                      return <option key={locType.id} value={locType.id}>{locType.name}</option>
+                                    })}
                                 </NativeSelect>
                             </FormControl>
                             <div className='midFormText'>
