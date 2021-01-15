@@ -1,7 +1,10 @@
 const mongoose = require('mongoose');
 
 const locationSchema = new mongoose.Schema({
-  tripId: {type: String},
+  trip: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'trip'
+  },
   summary: {type: String},
   lng: {type: Number},
   lat: {type: Number},

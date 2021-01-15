@@ -22,6 +22,7 @@ export default function TripMenu(props) {
 	};
 
 	const handleMenuItemClick = (event, index) => {
+    console.log(index);
 		setSelectedIndex(index);
 		setOpen(false);
 		if (index === 0) {

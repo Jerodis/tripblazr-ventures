@@ -10,11 +10,14 @@ export default {
 	async getMyTrips(userId) { // express
 		return fetch(`${remoteURL}/mytrips/${userId}`);
 	},
-	getAllPublicTrips() {
-		return fetch(`${remoteURL}/trips?published=true&_expand=user`).then(
-			result => result.json()
-		);
+	async getAllPublicTrips() { // express
+		return fetch(`${remoteURL}/public`);
 	},
+	// getAllPublicTrips() {
+	// 	return fetch(`${remoteURL}/trips?published=true&_expand=user`).then(
+	// 		result => result.json()
+	// 	);
+	// },
   async getTripLocations(tripId) { // express
 		return fetch(`${remoteURL}/locations/${tripId}`);
 	},
@@ -31,12 +34,14 @@ export default {
 	// 		result => result.json()
 	// 	);
 	// },
-
-	getTripByType(id, typeId) {
-		return fetch(
-			`${remoteURL}/locations?tripId=${id}&locationTypeId=${typeId}&_expand=locationType&_embed=locationNotes`
-		).then(result => result.json());
+	async getTripByType(tripId, typeId) {
+		return fetch(`${remoteURL}/locations/${tripId}?locationTypeId=${typeId}`);
 	},
+	// getTripByType(id, typeId) {
+	// 	return fetch(
+	// 		`${remoteURL}/locations?tripId=${id}&locationTypeId=${typeId}&_expand=locationType&_embed=locationNotes`
+	// 	).then(result => result.json());
+	// },
 	async deleteTrip(tripId) { // express
 		return fetch(`${remoteURL}/delete/${tripId}`, {
 			method: 'DELETE'
@@ -136,11 +141,14 @@ export default {
 	// 		body: JSON.stringify(editedLocation)
 	// 	}).then(data => data.json());
 	// },
-	getStarTrip(id) {
-		return fetch(
-			`${remoteURL}/locations?tripId=${id}&star=true&_expand=locationType&_embed=locationNotes`
-		).then(result => result.json());
+	async getStarTrip(tripId) { // express
+		return fetch(`${remoteURL}/locations/${tripId}?star=true`);
 	},
+	// getStarTrip(id) {
+	// 	return fetch(
+	// 		`${remoteURL}/locations?tripId=${id}&star=true&_expand=locationType&_embed=locationNotes`
+	// 	).then(result => result.json());
+	// },
 	async getLocationNotes(locationId) { // express
 		return fetch(`${remoteURL}/locationNotes/${locationId}`);
 	},
@@ -203,28 +211,49 @@ export default {
 	// 		body: JSON.stringify(editedLocationNote)
 	// 	}).then(data => data.json());
 	// },
-	getSharedTrips(userEmail) {
+	async getSharedTrips(userEmail) { // express
 		return fetch(
-			`${remoteURL}/sharedTrips?friendEmail=${userEmail}&_expand=trip&_expand=user`
-		).then(result => result.json());
+			`${remoteURL}/sharedTrips/${userEmail}`);
 	},
-	getTripsShares(tripId) {
-		return fetch(`${remoteURL}/sharedTrips?tripId=${tripId}`).then(result =>
-			result.json()
-		);
+	// getSharedTrips(userEmail) {
+	// 	return fetch(
+	// 		`${remoteURL}/sharedTrips?friendEmail=${userEmail}&_expand=trip&_expand=user`
+	// 	).then(result => result.json());
+	// },
+	async getTripShares(tripId) { // express
+		return fetch(`${remoteURL}/tripShares/${tripId}`);
 	},
-	postTripShare(newShare) {
-		return fetch(`${remoteURL}/sharedTrips`, {
+	// getTripsShares(tripId) {
+	// 	return fetch(`${remoteURL}/sharedTrips?tripId=${tripId}`).then(result =>
+	// 		result.json()
+	// 	);
+	// },
+	postTripShare(newShare) { // express
+		return fetch(`${remoteURL}/sharedTrip`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json'
 			},
 			body: JSON.stringify(newShare)
-		}).then(data => data.json());
+		});
 	},
-	deleteTripShare(id) {
+	// postTripShare(newShare) {
+	// 	return fetch(`${remoteURL}/sharedTrips`, {
+	// 		method: 'POST',
+	// 		headers: {
+	// 			'Content-Type': 'application/json'
+	// 		},
+	// 		body: JSON.stringify(newShare)
+	// 	}).then(data => data.json());
+	// },
+	deleteTripShare(id) { // express
 		return fetch(`${remoteURL}/sharedTrips/${id}`, {
 			method: 'DELETE'
-		}).then(result => result.json());
+		});
 	}
+	// deleteTripShare(id) {
+	// 	return fetch(`${remoteURL}/sharedTrips/${id}`, {
+	// 		method: 'DELETE'
+	// 	}).then(result => result.json());
+	// }
 };

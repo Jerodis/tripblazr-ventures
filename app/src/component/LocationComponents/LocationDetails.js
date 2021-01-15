@@ -95,8 +95,8 @@ class LocationDetail extends Component {
 	async componentDidMount() {
     const allTripsRequest = await TripManager.getMyTrips(this.props.activeUser);
     const allTripsResult = await allTripsRequest.json();
-
-    const tripDetailsRequest = await TripManager.getTripDetails(this.props.location.tripId);
+    
+    const tripDetailsRequest = await TripManager.getTripDetails(this.props.location.trip);
     const tripDetailsResult = await tripDetailsRequest.json();
 
     this.setState({

@@ -1,14 +1,27 @@
 const router = require('express').Router();
 const Trip = require('../models/tripModel');
 const Location = require('../models/locationModel');
+const SharedTrip = require('../models/sharedTripModel');
 const LocationNote = require('../models/locationNoteModel');
 
 router.get('/myTrips/:userId', async (req, res) => {
   try {
     // needs error handling
     const { userId } = req.params;
-    const myTrips = await Trip.find({'userId': userId});
+    const myTrips = await Trip.find({'user': userId})
+      .populate('user', 'username email');
     res.json(myTrips);
+  } catch (err) {
+    res.status(500).json({error: err.message});
+  }
+});
+
+router.get('/public', async (req, res) => {
+  try {
+    // needs error handling
+    const publicTrips = await Trip.find({'published': true})
+      .populate('user', 'username email');
+    res.json(publicTrips);
   } catch (err) {
     res.status(500).json({error: err.message});
   }
@@ -18,7 +31,8 @@ router.get('/:tripId', async (req, res) => {
   try {
     // needs error handling
     const { tripId } = req.params;
-    const trip = await Trip.findById(tripId);
+    const trip = await Trip.findById(tripId)
+      .populate('user', 'username email');
     res.json(trip);
   } catch (err) {
     res.status(500).json({error: err.message});
@@ -55,7 +69,8 @@ router.patch('/update', async (req, res) => {
     // needs error handling
     const trip = req.body;
     const tripOld = await Trip.findByIdAndUpdate(trip._id, trip)
-    const updatedTrip = await Trip.findById(trip._id);
+    const updatedTrip = await Trip.findById(trip._id)
+      .populate('user', 'username email');
     res.json(updatedTrip);
   } catch (err) {
     res.status(500).json({error: err.message});
@@ -66,6 +81,7 @@ router.patch('/location/update', async (req, res) => {
   try {
     // needs error handling
     const location = req.body;
+    console.log(location, 'loc');
     const locationOld = await Location.findByIdAndUpdate(location._id, location)
     const updatedLocation = await Location.findById(location._id);
     res.json(updatedLocation);
@@ -93,8 +109,28 @@ router.get('/locations/:tripId', async (req, res) => {
   try {
     // needs error handling
     const { tripId } = req.params;
-    const tripLocations = await Location.find({"tripId" : tripId  });
-    res.json(tripLocations);
+    const hasQuery = Object.keys(req.query).length > 0;
+    if (hasQuery) {
+      const star = req.query.star;
+      const locationTypeId = req.query.locationTypeId;
+      if (star) {
+        const tripLocations = await Location.find({
+          'trip' : tripId,
+          star
+        });
+        res.json(tripLocations);
+      }
+      if (locationTypeId) {
+        const tripLocations = await Location.find({
+          'trip' : tripId,
+          'locationType.id' : parseInt(locationTypeId)
+        });
+        res.json(tripLocations);
+      }
+    } else {
+      const tripLocations = await Location.find({"trip" : tripId });
+      res.json(tripLocations);
+    }
   } catch (err) {
     res.status(500).json({error: err.message});
   }
@@ -162,7 +198,7 @@ router.post('/locations', async (req, res) => {
   try {
     // needs error handling
     const location = req.body;
-    const newLocation = new Location(location)
+    const newLocation = new Location(location);
     const savedLocation = await newLocation.save();
     res.json(savedLocation);
   } catch (err) {
@@ -177,6 +213,51 @@ router.post('/', async (req, res) => {
     const newTrip = new Trip(trip)
     const savedTrip = await newTrip.save();
     res.json(savedTrip);
+  } catch (err) {
+    res.status(500).json({error: err.message});
+  }
+});
+
+router.get('/sharedTrips/:email', async (req, res) => {
+  try {
+    const { email } = req.params;
+    const sharedTrips = await SharedTrip.find({'friendEmail' : email})
+      .populate('trip')
+      .populate('user', 'email username');
+      res.json(sharedTrips);
+  } catch (err) {
+    res.status(500).json({error: err.message});
+  }
+});
+
+router.get('/tripShares/:tripId', async (req, res) => {
+  try {
+    const { tripId } = req.params;
+    const tripShares = await SharedTrip.find({'trip' : tripId})
+      .populate('trip')
+      .populate('user', 'email username');
+    res.json(tripShares);
+  } catch (err) {
+    res.status(500).json({error: err.message});
+  }
+});
+
+router.post('/sharedTrip', async (req, res) => {
+  try {
+    const sharedTrip = req.body;
+    const newSharedTrip = new SharedTrip(sharedTrip);
+    const savedSharedTrip = await newSharedTrip.save();
+    res.json(savedSharedTrip);
+  } catch (err) {
+    res.status(500).json({error: err.message});
+  }
+});
+
+router.delete('/sharedTrips/:sharedTripId', async (req, res) => {
+  try {
+    const { sharedTripId } = req.params;
+    const deletedTrip = await SharedTrip.findByIdAndDelete(sharedTripId);
+    res.json(deletedTrip);
   } catch (err) {
     res.status(500).json({error: err.message});
   }

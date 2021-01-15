@@ -123,31 +123,55 @@ class Trip extends Component {
 
 	//filter by type
 
-	filterType = id => {
-		TripManager.getTripByType(this.props.tripId, id).then(locations => {
-			this.setState({
-				locations: locations,
-				clickedCoords: [],
-				droppedPin: false,
-				lastFilter: id
-			});
-			this.refs.mapper.resetScroll();
-			console.log(this.state.lastFilter);
-		});
+	filterType = async (filterId) => {
+    const tripByTypeRequest = await TripManager.getTripByType(this.props.tripId, filterId);
+    const tripByTypeResult = await tripByTypeRequest.json();
+
+    this.setState({
+      locations: tripByTypeResult,
+      clickedCoords: [],
+      droppedPin: false,
+      lastFilter: filterId
+    });
+
+    this.refs.mapper.resetScroll();
+
+		// TripManager.getTripByType(this.props.tripId, id).then(locations => {
+		// 	this.setState({
+		// 		locations: locations,
+		// 		clickedCoords: [],
+		// 		droppedPin: false,
+		// 		lastFilter: id
+		// 	});
+		// 	this.refs.mapper.resetScroll();
+		// 	console.log(this.state.lastFilter);
+		// });
 	};
 
 	//filter results by starred
 
-	filterByStar = () => {
-		TripManager.getStarTrip(this.props.tripId).then(locations => {
-			this.setState({
-				locations: locations,
-				clickedCoords: [],
-				droppedPin: false,
-				lastFilter: 'star'
-			});
-			this.refs.mapper.resetScroll();
-		});
+	filterByStar = async () => {
+    const starTripRequest = await TripManager.getStarTrip(this.props.tripId);
+    const starTripResult = await starTripRequest.json();
+
+    this.setState({
+      locations: starTripResult,
+      clickedCoords: [],
+      droppedPin: false,
+      lastFilter: 'star'
+    });
+
+    this.refs.mapper.resetScroll();
+    
+		// TripManager.getStarTrip(this.props.tripId).then(locations => {
+		// 	this.setState({
+		// 		locations: locations,
+		// 		clickedCoords: [],
+		// 		droppedPin: false,
+		// 		lastFilter: 'star'
+		// 	});
+		// 	this.refs.mapper.resetScroll();
+		// });
 	};
 
 	//clear clicked coordinates
@@ -202,15 +226,20 @@ class Trip extends Component {
 
 	//fetch trip locations and trip details
 
-	getData = () => {
-		TripManager.getTripLocations(this.props.tripId).then(locations => {
-			this.setState({
-				locations: locations,
-				clickedCoords: []
-			});
-		});
+	getData = async () => {
+    const tripLocationsRequest = await TripManager.getTripLocations(this.props.tripId);
+    const tripLocationsResults = await tripLocationsRequest.json();
+
+		// TripManager.getTripLocations(this.props.tripId).then(locations => {
+		// 	this.setState({
+		// 		locations: locations,
+		// 		clickedCoords: []
+		// 	});
+		// });
 
 		this.setState({
+      locations: tripLocationsResults,
+      clickedCoords: [],
 			geoMarker: {},
 			lastFilter: ''
 		});
@@ -247,13 +276,13 @@ class Trip extends Component {
 		// 		}
 		// 	);
 		// } else {
-      const tripLocationsRequest = await TripManager.getTripLocations(this.props.tripId);
-      const tripLocationsResults = await tripLocationsRequest.json();
-			this.setState({
-				locations: tripLocationsResults,
-				clickedCoords: [],
-				droppedPin: false
-			});
+    const tripLocationsRequest = await TripManager.getTripLocations(this.props.tripId);
+    const tripLocationsResults = await tripLocationsRequest.json();
+		this.setState({
+			locations: tripLocationsResults,
+			clickedCoords: [],
+			droppedPin: false
+		});
 		// }
 		this.setState({
 			geoMarker: {}
@@ -288,12 +317,11 @@ class Trip extends Component {
 			// 		// function to check whether a trip has been shared with your email
 			// 		return element.friendEmail === email;
       // 	};
-      
       const tripDetailsRequest = await TripManager.getTripDetails(this.props.tripId);
       const tripDetailsResult = await tripDetailsRequest.json();
       if (!tripDetailsResult) 
         this.props.history.push(`mytrips`);
-      if (tripDetailsResult.userId === this.props.activeUser) {
+      if (tripDetailsResult.user._id === this.props.activeUser) {
         this.setState({
           myTrip: true,
           tripDetails: tripDetailsResult
@@ -520,7 +548,7 @@ class Trip extends Component {
 					<TripDetails
 						handleClose={this.handleCloseTrip}
 						activeUser={this.props.activeUser}
-						tripId={this.state.tripDetails.id}
+						tripId={this.state.tripDetails._id}
 						likes={this.state.tripDetails.likes}
 						published={this.state.tripDetails.published}
 					/>

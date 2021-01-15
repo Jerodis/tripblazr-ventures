@@ -2,7 +2,6 @@ const mongoose = require('mongoose');
 
 const tripSchema = new mongoose.Schema({
   name: {type: String, required: true},
-  userId: {type: String, required: true},
   summary: {type: String},
   communication: {type: String},
   money: {type: String},
@@ -11,7 +10,11 @@ const tripSchema = new mongoose.Schema({
   lat: {type: Number},
   likes: {type: Number},
   city: {type: String},
-  loadingState: {type: Boolean, default: false}
+  loadingState: {type: Boolean, default: false},
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'user'
+  }
 });
 
 module.exports = Trip = mongoose.model('trip', tripSchema);

@@ -286,7 +286,7 @@ class MobileTrip extends Component {
 					if (details.length === 0) {
 						this.props.history.push(`/mytrips`);
 					//details and ownership match active user display trip
-					} else if (details[0].userId === this.props.activeUser) {
+					} else if (details[0].user._id === this.props.activeUser) {
 						this.setState({
 							myTrip: true,
 							tripDetails: details[0]

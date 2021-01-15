@@ -97,7 +97,7 @@ class LocationForm extends Component {
         } else {
             this.setState({ loadingStatus: true });
             const location = {
-                tripId: this.state.tripId,
+                trip: this.state.tripId,
                 summary: this.state.summary,
                 lat: this.state.lat,
                 lng: this.state.lng,
@@ -114,7 +114,7 @@ class LocationForm extends Component {
 
             const postLocationRequest = await TripManager.postLocation(location);
             const postLocationResult = await postLocationRequest.json();
-            console.log(postLocationResult, 'rezzy');
+            
             this.props.getData();
             this.setState({ loadingStatus: false });
         }

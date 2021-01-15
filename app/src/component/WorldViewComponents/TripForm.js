@@ -67,8 +67,10 @@ class TripForm extends Component {
                 money: this.state.money,
                 likes: this.state.likes,
                 published: false,
-                userId: this.state.userId
+                user: this.state.userId
             };
+
+            console.log(trip);
 
             // Create the animal and redirect user to animal list
             this.props.handleClose();

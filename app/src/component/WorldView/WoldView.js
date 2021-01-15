@@ -84,8 +84,14 @@ class TripList extends Component {
       publicView: false
     });
 
-    // const sharedTripsRequest = await TripManager.getSharedTrips(this.props.email);
-    // const sharedTripResult = await sharedTripsRequest.json();
+    const sharedTripsRequest = await TripManager.getSharedTrips(this.props.email);
+    const sharedTripResult = await sharedTripsRequest.json();
+
+    const sharedMapTrips = sharedTripResult.map(sharedTrip => sharedTrip.trip);
+    this.setState({
+      sharedMapTrips,
+      sharedTrips: sharedTripResult
+    });
 
     // this.setState({
     //   sharedMapTrips: sharedTripResult
@@ -173,16 +179,26 @@ class TripList extends Component {
 		//console.log('ref', this.refs);
 	};
 
-	getPublicTrips = () => {
-		TripManager.getAllPublicTrips().then(newTrips => {
-			//this.props.removeOwner();
-			this.setState({
-				trips: newTrips,
-				clickedCoords: [],
-				publicView: true,
-				shareView: false
-			});
-		});
+	getPublicTrips = async () => {
+    const getPublicTripsRequest = await TripManager.getAllPublicTrips();
+    const getPublicTripsResult = await getPublicTripsRequest.json();
+
+    this.setState({
+      trips:getPublicTripsResult,
+      clickedCoords: [],
+      publicView: true,
+      shareView: false
+    });
+
+		// TripManager.getAllPublicTrips().then(newTrips => {
+		// 	//this.props.removeOwner();
+		// 	this.setState({
+		// 		trips: newTrips,
+		// 		clickedCoords: [],
+		// 		publicView: true,
+		// 		shareView: false
+		// 	});
+		// });
 		//this.refs.map.resetMap();
 	};
 

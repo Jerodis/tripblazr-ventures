@@ -47,11 +47,13 @@ class TripDetails extends Component {
         this.setState(stateToChange);
     };
 
-    handleDelete = id => {
-        TripManager.deleteTripShare(id).then(() => this.getShares());
+    handleDelete = async (id) => {
+        // TripManager.deleteTripShare(id).then(() => this.getShares());
+        await TripManager.deleteTripShare(id);
+        this.getShares();
     };
 
-    constructNewTripShare = evt => {
+    constructNewTripShare = async (evt) => {
         evt.preventDefault();
         if (this.state.friendEmail === '') {
             window.alert('Please input an email to share this trip');
@@ -59,57 +61,86 @@ class TripDetails extends Component {
             this.setState({ loadingStatus: true });
             const share = {
                 friendEmail: this.state.friendEmail,
-                userId: this.props.activeUser,
-                tripId: this.props.tripId,
+                user: this.props.activeUser,
+                trip: this.props.tripId,
                 loadingStatus: true
             };
 
-            TripManager.postTripShare(share).then(() => {
-                //console.log('addform props', this.props);
-                TripManager.getTripsShares(this.props.tripId).then(data => {
-                    this.setState({
-                        tripShares: data,
-                        loadingStatus: false,
-                        friendEmail: ''
-                    });
-                });
+            await TripManager.postTripShare(share);
+            const tripSharesRequest = await TripManager.getTripShares(this.props.tripId);
+            const tripSharesResult = await tripSharesRequest.json();
+            this.setState({
+              tripShares: tripSharesResult,
+              loadingStatus: false,
+              friendEmail: ''
             });
+
+            // TripManager.postTripShare(share).then(() => {
+            //     //console.log('addform props', this.props);
+            //     TripManager.getTripsShares(this.props.tripId).then(data => {
+            //         this.setState({
+            //             tripShares: data,
+            //             loadingStatus: false,
+            //             friendEmail: ''
+            //         });
+            //     });
+            // });
         }
     };
 
-    ShareTrip = () => {
-        let trip = {
-            id: this.props.tripId,
-            published: true,
-            loadingState: true
-        };
-        TripManager.updateTrip(trip).then(() => {
-            this.setState({
-                published: true,
-                loadingState: false
-            });
-        });
+    ShareTrip = async () => {
+      let trip = {
+        _id: this.props.tripId,
+        published: true,
+        loadingState: true
+      };
+
+      await TripManager.updateTrip(trip);
+      this.setState({
+        published: true,
+        loadingState: false
+      });
+
+        // TripManager.updateTrip(trip).then(() => {
+        //     this.setState({
+        //         published: true,
+        //         loadingState: false
+        //     });
+        // });
     };
 
-    HideTrip = () => {
-        let trip = {
-            id: this.props.tripId,
-            published: false
-        };
-        TripManager.updateTrip(trip).then(() => {
-            this.setState({
-                published: false,
-                loadingState: false
-            });
-        });
+    HideTrip = async () => {
+      let trip = {
+        _id: this.props.tripId,
+        published: false
+      };
+
+      await TripManager.updateTrip(trip);
+      this.setState({
+        published: false,
+        loadingState: false
+      });
+        // TripManager.updateTrip(trip).then(() => {
+        //     this.setState({
+        //         published: false,
+        //         loadingState: false
+        //     });
+        // });
     };
 
-    getShares = () => {
-        TripManager.getTripsShares(this.props.tripId).then(data => {
-            this.setState({
-                tripShares: data
-            });
-        });
+    getShares = async () => {
+      const tripSharesRequest = await TripManager.getTripShares(this.props.tripId);
+      const tripSharesResult = await tripSharesRequest.json();
+
+      this.setState({
+        tripShares: tripSharesResult
+      });
+
+        // TripManager.getTripsShares(this.props.tripId).then(data => {
+        //     this.setState({
+        //         tripShares: data
+        //     });
+        // });
     };
 
     componentDidMount() {
@@ -204,7 +235,7 @@ class TripDetails extends Component {
                                 <Tooltip title='remove from trip'>
                                     <IconButton
                                         onClick={e =>
-                                            this.handleDelete(share.id)
+                                            this.handleDelete(share._id)
                                         }
                                     >
                                         <DeleteIcon className='warning' />

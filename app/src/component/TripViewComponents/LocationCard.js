@@ -26,29 +26,29 @@ class LocationCard extends Component {
     this.props.getData();
 	};
 
-	addStar = (e, locationId) => {
-		e.stopPropagation();
+	addStar = async (e, locationId) => {
+    e.stopPropagation();
 		let location = {
-			id: locationId,
+			_id: locationId,
 			star: true
 		};
-		TripManager.updateLocation(location);
+		await TripManager.updateLocation(location);
 		this.setState({ star: true });
 	};
 
-	removeStar = (e, locationId) => {
+	removeStar = async (e, locationId) => {
 		e.stopPropagation();
 		let location = {
-			id: locationId,
+			_id: locationId,
 			star: false
 		};
-		TripManager.updateLocation(location);
+		await TripManager.updateLocation(location);
 		this.setState({ star: false });
 	};
 
 	render() {
 		let hoverCard;
-		if (this.props.hovered === this.props.location.id) {
+		if (this.props.hovered === this.props.location._id) {
 			hoverCard = 'tripCardHover';
 		} else {
 			hoverCard = 'tripCard' + this.props.location.locationType.id;
@@ -71,12 +71,12 @@ class LocationCard extends Component {
 									<StarIcon
 										className='starred'
 										color='secondary'
-										onClick={e => this.removeStar(e, this.props.location.id)}
+										onClick={e => this.removeStar(e, this.props.location._id)}
 									/>
 								) : (
 									<StarBorderIcon
 										className='starred'
-										onClick={e => this.addStar(e, this.props.location.id)}
+										onClick={e => this.addStar(e, this.props.location._id)}
 									/>
 								)}
 							</p>

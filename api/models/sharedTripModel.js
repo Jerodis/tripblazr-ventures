@@ -2,8 +2,14 @@ const mongoose = require('mongoose');
 
 const sharedTripSchema = new mongoose.Schema({
   friendEmail: {type: String, required: true},
-  userId: {type: String, required: true},
-  tripId: {type: String},
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'user'
+  },
+  trip: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'trip'
+  },
   loadingStatus: {type: Boolean, default: false}
 });
 
