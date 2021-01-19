@@ -1,5 +1,6 @@
 // This is the page that will call the API calls for the authentication
-const remoteURL = 'http://localhost:5000/trips';
+const remoteURL = 'https://api-dot-tb-ventures.uc.r.appspot.com/trips';
+// const remoteURL = 'http://localhost:5000/trips';
 
 export default {
 	// getAllTrips(id) {

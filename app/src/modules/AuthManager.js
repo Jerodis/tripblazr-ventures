@@ -1,5 +1,6 @@
 // This is the page that will call the API calls for the authentication
-const remoteURL = 'http://localhost:5000/users';
+const remoteURL = 'https://api-dot-tb-ventures.uc.r.appspot.com/users';
+// const remoteURL = 'http://localhost:5000/users';
 
 export default {
 	getUser(userName) {

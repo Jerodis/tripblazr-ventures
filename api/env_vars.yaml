@@ -1,0 +1,3 @@
+env_variables:
+  MONGODB_CONNECTION_STRING: mongodb+srv://dev-user-1:ahKCOaROtAxBwof4@main.dqfz4.mongodb.net/travel-blazr?retryWrites=true&w=majority
+  JWT_SECRET: yw\s8Md$?};??.7+bb>fLa[M]qAR{W
